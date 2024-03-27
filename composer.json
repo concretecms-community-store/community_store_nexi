@@ -1,0 +1,23 @@
+{
+    "name": "concretecms-community-store/community_store_nexi",
+    "description": "Nexi Payment Method for the Community Store package of ConcreteCMS",
+    "type": "concrete5-package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michele Locati",
+            "email": "michele@locati.it"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">= 7.2",
+        "mlocati/nexi": "dev-main"
+    },
+    "config": {
+        "optimize-autoloader" : true,
+        "preferred-install": "dist",
+        "sort-packages" : true
+    },
+    "$schema": "https://raw.githubusercontent.com/composer/composer/main/res/composer-schema.json"
+}
