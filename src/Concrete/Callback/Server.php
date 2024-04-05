@@ -123,7 +123,8 @@ class Server
      */
     private function verifyWebhookRequest(WebhookRequest $webhookRequest, HostedOrder $hostedOrder): bool
     {
-        if ($hostedOrder->getResponse() === null || $hostedOrder->getResponse()->getSecurityToken() !== $webhookRequest->getSecurityToken()) {
+        $hostedOrderResponse = $hostedOrder->getResponse();
+        if ($hostedOrderResponse === null || $hostedOrderResponse->getSecurityToken() !== $webhookRequest->getSecurityToken()) {
             throw new UserMessageException(t('Wrong security token'));
         }
         $operation = $webhookRequest->getOperation();
