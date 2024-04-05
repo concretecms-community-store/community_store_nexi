@@ -12,7 +12,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">= 7.2",
-        "mlocati/nexi": "dev-main"
+        "mlocati/nexi": "^1"
     },
     "config": {
         "optimize-autoloader" : true,
