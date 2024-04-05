@@ -13,11 +13,11 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '5.5'
+          php-version: '7.2'
           tools: composer:v1
           coverage: none
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Create and attach ZIP
         uses: concrete5-community/gh-package-release-attach@main
         env:
