@@ -2,8 +2,8 @@
 
 namespace Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
 
-use DateTime;
 use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
+use DateTime;
 
 defined('C5_EXECUTE') or die('Access Denied.');
 
@@ -64,7 +64,7 @@ class Check
      * @Doctrine\ORM\Mapping\Column(type="text", nullable=false, options={"comment": "Processing error"})
      */
     protected string $error;
-    
+
     /**
      * @param string $place where the verification occurred (server for server2server communications, customer for customer requests)
      */
@@ -121,7 +121,7 @@ class Check
 
         return $this;
     }
-    
+
     /**
      * Get the HostedOrder associated to this request.
      */
@@ -139,7 +139,7 @@ class Check
 
         return $this;
     }
-    
+
     /**
      * Get the processing error.
      */

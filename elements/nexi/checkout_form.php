@@ -78,7 +78,7 @@ if ($environment === Configuration::ENVIRONMENT_SANDBOX) {
             ?>
             <div>
                 <?= t('In order to test the payment method you can use these values:') ?>
-                <?php $cardsPrinter($goodCards); ?>
+                <?php $cardsPrinter($goodCards) ?>
             </div>
             <?php
             $badCards = $testCard->getCards(false);
@@ -86,7 +86,7 @@ if ($environment === Configuration::ENVIRONMENT_SANDBOX) {
                 ?>
                 <div>
                     <?= t('In order to test FAILED payments you can use these values:') ?>
-                    <?php $cardsPrinter($badCards); ?>
+                    <?php $cardsPrinter($badCards) ?>
                 </div>
                 <?php
             }

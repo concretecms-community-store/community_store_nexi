@@ -13,7 +13,7 @@ extract($vars);
 
 /**
  * @var Concrete\Core\Form\Service\Form $form
- * @var string $environment 
+ * @var string $environment
  * @var array $environments
  * @var array $defaultBaseURLs
  * @var array $baseURLs

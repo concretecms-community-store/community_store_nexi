@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Concrete\Package\CommunityStoreNexi;
@@ -6,8 +7,8 @@ namespace Concrete\Package\CommunityStoreNexi;
 use Concrete\Core\Database\EntityManager\Provider\ProviderAggregateInterface;
 use Concrete\Core\Database\EntityManager\Provider\StandardPackageProvider;
 use Concrete\Core\Package\Package;
-use Concrete\Package\CommunityStore\Src\CommunityStore;
 use Concrete\Core\Routing\Router;
+use Concrete\Package\CommunityStore\Src\CommunityStore;
 
 defined('C5_EXECUTE') or die('Access Denied');
 

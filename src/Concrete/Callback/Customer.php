@@ -9,17 +9,17 @@ use Concrete\Core\Error\UserMessageException;
 use Concrete\Core\Http\ResponseFactoryInterface;
 use Concrete\Core\Session\SessionValidator;
 use Concrete\Core\Url\Resolver\Manager\ResolverManagerInterface;
-use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
 use Concrete\Package\CommunityStore\Src\CommunityStore\Order;
+use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
+use Concrete\Package\CommunityStoreNexi\Nexi\Configuration\Factory as ConfigurationFactory;
+use Concrete\Package\CommunityStoreNexi\Nexi\HttpClient;
 use Doctrine\ORM\EntityManagerInterface;
 use MLocati\Nexi\Client;
 use MLocati\Nexi\Entity\FindOrderById\Response as NexiFoundOrder;
-use Concrete\Package\CommunityStoreNexi\Nexi\HttpClient;
 use MLocati\Nexi\Entity\Operation as NexiOperation;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
-use Concrete\Package\CommunityStoreNexi\Nexi\Configuration\Factory as ConfigurationFactory;
 
 defined('C5_EXECUTE') or die('Access Denied');
 
@@ -54,7 +54,7 @@ class Customer
      * @var \Concrete\Package\CommunityStoreNexi\Nexi\HttpClient
      */
     private $httpClient;
-    
+
     /**
      * @var \Concrete\Core\Application\Service\UserInterface
      */
@@ -74,8 +74,7 @@ class Customer
         HttpClient $httpClient,
         UserInterface $userInterface,
         Service $service
-    )
-    {
+    ) {
         $this->sessionValidator = $sessionValidator;
         $this->em = $em;
         $this->responseFactory = $responseFactory;
@@ -111,6 +110,7 @@ class Customer
                 $operation = $this->getOperation($nexiOrder);
                 if ($operation === null) {
                     $check->setError(t('Missing operation'));
+
                     return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['/checkout']));
                 }
                 try {
@@ -119,6 +119,7 @@ class Customer
                     }
                 } catch (UserMessageException $x) {
                     $check->setError($x->getMessage());
+
                     return $this->userInterface->buildErrorResponse(
                         t('Payment failed'),
                         implode('<br />', [
@@ -174,6 +175,7 @@ class Customer
                 }
             }
         }
+
         return null;
     }
 

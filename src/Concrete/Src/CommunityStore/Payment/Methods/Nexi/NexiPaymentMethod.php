@@ -10,20 +10,20 @@ use Concrete\Core\Support\Facade\Application;
 use Concrete\Core\Url\Resolver\Manager\ResolverManagerInterface;
 use Concrete\Package\CommunityStore\Src\CommunityStore;
 use Concrete\Package\CommunityStoreNexi;
-use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
-use Throwable;
-use Concrete\Package\CommunityStoreNexi\Nexi;
 use Concrete\Package\CommunityStoreNexi\Entity;
+use Concrete\Package\CommunityStoreNexi\Nexi;
 use Concrete\Package\CommunityStoreNexi\Nexi\Configuration;
-use MLocati\Nexi\Dictionary\Currency;
+use Concrete\Package\CommunityStoreNexi\Nexi\LanguageService;
+use Doctrine\ORM\EntityManagerInterface;
 use MLocati\Nexi\Client;
-use MLocati\Nexi\Entity\PaymentMethod;
-use MLocati\Nexi\Exception as NexiException;
-use stdClass;
+use MLocati\Nexi\Dictionary\Currency;
 use MLocati\Nexi\Dictionary\TestCard;
 use MLocati\Nexi\Entity as NexiEntity;
-use Concrete\Package\CommunityStoreNexi\Nexi\LanguageService;
+use MLocati\Nexi\Entity\PaymentMethod;
+use MLocati\Nexi\Exception as NexiException;
+use RuntimeException;
+use stdClass;
+use Throwable;
 
 defined('C5_EXECUTE') or die('Access Denied');
 
@@ -190,7 +190,7 @@ class NexiPaymentMethod extends CommunityStore\Payment\Method
                 );
                 $paymentMethods = json_encode($client->listSupportedPaymentMethods()->getPaymentMethods());
                 $config->set('community_store_nexi::options.paymentMethods', $paymentMethods);
-                $config->save('community_store_nexi::options.paymentMethods', $paymentMethods); 
+                $config->save('community_store_nexi::options.paymentMethods', $paymentMethods);
             }
             $config->save("community_store_nexi::options.environments.{$env}.baseURL", $baseURL);
             $config->save("community_store_nexi::options.environments.{$env}.apiKey", $apiKey);

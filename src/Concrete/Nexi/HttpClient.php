@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Concrete\Package\CommunityStoreNexi\Nexi;
 
-use MLocati\Nexi\Exception\HttpRequestFailed;
-use MLocati\Nexi\HttpClient as NexiHttpClient;
 use Concrete\Core\Http\Client\Client;
 use GuzzleHttp\Client as GuzzleHttpClient;
+use MLocati\Nexi\Exception\HttpRequestFailed;
+use MLocati\Nexi\HttpClient as NexiHttpClient;
 use Throwable;
 use Zend\Http\Request as ZendRequest;
 
@@ -33,6 +33,7 @@ class HttpClient implements NexiHttpClient
         if ($this->coreClient instanceof GuzzleHttpClient) {
             return $this->invokeWithGuzzle($method, $url, $headers, $rawBody);
         }
+
         return $this->invokeWithZend($method, $url, $headers, $rawBody);
     }
 

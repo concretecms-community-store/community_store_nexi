@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Concrete\Package\CommunityStoreNexi\Callback;
 
+use Concrete\Core\Error\UserMessageException;
 use Concrete\Core\Http\Request;
 use Concrete\Core\Http\Response;
 use Concrete\Core\Http\ResponseFactoryInterface;
 use Concrete\Package\CommunityStore\Src\CommunityStore\Order;
-use Doctrine\ORM\EntityManagerInterface;
 use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
-use Concrete\Core\Error\UserMessageException;
+use Doctrine\ORM\EntityManagerInterface;
 use MLocati\Nexi\Entity\Webhook\Request as WebhookRequest;
 use stdClass;
 
@@ -32,12 +32,12 @@ class Server
      * @var \Doctrine\ORM\EntityManagerInterface
      */
     private $em;
-    
+
     /**
      * @var \Concrete\Package\CommunityStoreNexi\Callback\Service
      */
     private $service;
-    
+
     public function __construct(
         Request $request,
         ResponseFactoryInterface $responseFactory,

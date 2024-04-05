@@ -7,8 +7,8 @@ namespace Concrete\Package\CommunityStoreNexi\Entity;
 use Concrete\Package\CommunityStore\Src\CommunityStore;
 use DateTime;
 use Doctrine\Common\Collections;
-use MLocati\Nexi\Entity\CreateOrderForHostedPayment\Response as NexiOrderResponse;
 use MLocati\Nexi\Entity\CreateOrderForHostedPayment\Request as NexiOrderRequest;
+use MLocati\Nexi\Entity\CreateOrderForHostedPayment\Response as NexiOrderResponse;
 
 defined('C5_EXECUTE') or die('Access Denied.');
 
@@ -55,7 +55,7 @@ class HostedOrder
      *
      * @Doctrine\ORM\Mapping\ManyToOne(targetEntity="Concrete\Package\CommunityStore\Src\CommunityStore\Order\Order")
      * @Doctrine\ORM\Mapping\JoinColumn(name="associatedOrder", referencedColumnName="oID", nullable=false, onDelete="CASCADE")
-     * 
+     *
      * @var \Concrete\Package\CommunityStore\Src\CommunityStore\Order\Order
      */
     protected $associatedOrder;
@@ -101,7 +101,7 @@ class HostedOrder
      *
      * @Doctrine\ORM\Mapping\OneToMany(targetEntity="Concrete\Package\CommunityStoreNexi\Entity\HostedOrder\Check", mappedBy="hostedOrder")
      * @Doctrine\ORM\Mapping\OrderBy({"createdOn"="ASC", "id"="ASC"})
-     * 
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $checks;
@@ -155,14 +155,6 @@ class HostedOrder
     }
 
     /**
-     * Get the request (in JSON format).
-     */
-    protected function getRequestJson(): string
-    {
-        return $this->requestJson;
-    }
-
-    /**
      * Get the request.
      */
     public function getRequest(): NexiOrderRequest
@@ -170,14 +162,6 @@ class HostedOrder
         $data = json_decode($this->getRequestJson());
 
         return new NexiOrderRequest($data);
-    }
-
-    /**
-     * Get the response, if available (in JSON format).
-     */
-    protected function getResponseJson(): string
-    {
-        return $this->responseJson;
     }
 
     /**
@@ -192,18 +176,6 @@ class HostedOrder
         $data = json_decode($json);
 
         return new NexiOrderResponse($data);
-    }
-
-    /**
-     * Set the response, if available (in JSON format).
-     *
-     * @return $this
-     */
-    protected function setResponseJson(string $value): self
-    {
-        $this->responseJson = $value;
-
-        return $this;
     }
 
     /**
@@ -237,5 +209,33 @@ class HostedOrder
     public function getChecks(): Collections\Collection
     {
         return $this->checks;
+    }
+
+    /**
+     * Get the request (in JSON format).
+     */
+    protected function getRequestJson(): string
+    {
+        return $this->requestJson;
+    }
+
+    /**
+     * Get the response, if available (in JSON format).
+     */
+    protected function getResponseJson(): string
+    {
+        return $this->responseJson;
+    }
+
+    /**
+     * Set the response, if available (in JSON format).
+     *
+     * @return $this
+     */
+    protected function setResponseJson(string $value): self
+    {
+        $this->responseJson = $value;
+
+        return $this;
     }
 }

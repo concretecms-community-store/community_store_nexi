@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Concrete\Package\CommunityStoreNexi\Callback;
@@ -19,11 +20,10 @@ class Service
      * @var \Concrete\Core\System\Mutex\MutexInterface
      */
     private $mutex;
-    
+
     public function __construct(
         MutexInterface $mutex
-    )
-    {
+    ) {
         $this->mutex = $mutex;
     }
 
@@ -36,6 +36,7 @@ class Service
         for (;;) {
             try {
                 $this->mutex->acquire(static::MUTEX_KEY);
+
                 return;
             } catch (MutexBusyException $x) {
                 $elapsedTime = time() - $startTime;
@@ -76,7 +77,7 @@ class Service
                 return false;
             case 'DECLINED':
                 throw new UserMessageException(t('The payment has been declined by the issuer during the authorization phase.'));
-            case 'DENIED_BY_RISK': //
+            case 'DENIED_BY_RISK':
                 throw new UserMessageException(t('The payment has been declined because of negative outcome of the transaction risk analysis.'));
             case 'THREEDS_VALIDATED':
                 throw new UserMessageException(t('The payment has been declined because of 3DS authentication OK or 3DS skipped (non-secure payment).'));
