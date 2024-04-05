@@ -27,17 +27,11 @@ class Configuration implements ConfigurationInterface
      */
     private $apiKey;
 
-    /**
-     * @var bool
-     */
-    private $allowUnsafeHttps;
-
-    public function __construct(string $environment, string $baseURL, string $apiKey, bool $allowUnsafeHttps = false)
+    public function __construct(string $environment, string $baseURL, string $apiKey)
     {
         $this->environment = $environment;
         $this->baseURL = $baseURL;
         $this->apiKey = $apiKey;
-        $this->allowUnsafeHttps = $allowUnsafeHttps;
     }
 
     public function getEnvironment(): string
@@ -74,15 +68,5 @@ class Configuration implements ConfigurationInterface
         }
 
         throw new RuntimeException(t('The Nexi API key for production is not set'));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see \MLocati\Nexi\Configuration::allowUnsafeHttps()
-     */
-    public function allowUnsafeHttps(): bool
-    {
-        return $this->allowUnsafeHttps;
     }
 }
