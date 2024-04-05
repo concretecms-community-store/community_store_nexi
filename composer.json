@@ -12,6 +12,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">= 7.2",
+        "concrete5/core": ">=8.5",
         "mlocati/nexi": "^1"
     },
     "config": {
