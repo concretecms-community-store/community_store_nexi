@@ -1,8 +1,8 @@
 <?php
 
-namespace Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
+namespace Concrete\Package\CommunityStoreNexi\Entity\XPayOrder;
 
-use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
+use Concrete\Package\CommunityStoreNexi\Entity\XPayOrder;
 use DateTime;
 
 defined('C5_EXECUTE') or die('Access Denied.');
@@ -10,15 +10,17 @@ defined('C5_EXECUTE') or die('Access Denied.');
 /**
  * @Doctrine\ORM\Mapping\Entity
  * @Doctrine\ORM\Mapping\Table(
- *     name="CommunityStoreNexiChecks",
- *     options={"comment": "Verify requests for Nexi payment method"}
+ *     name="CommunityStoreNexiXPayOrderChecks",
+ *     options={"comment": "Verify requests for Nexi XPay payment method"}
  * )
  */
 class Check
 {
+    const PLACE_CUSTOMER_CANCEL = 'cancel';
+    
+    const PLACE_CUSTOMER_REDIRECT = 'redirect';
+    
     const PLACE_SERVER = 'server';
-
-    const PLACE_CUSTOMER = 'customer';
 
     /**
      * The record ID (null if not yet persisted).
@@ -37,9 +39,9 @@ class Check
     protected DateTime $createdOn;
 
     /**
-     * The place where the verification occurred (server for server2server communications, customer for customer requests).
+     * The place where the verification occurred (server for server2server communications, cancel for customer canceled requests, redirect for processed customer requests).
      *
-     * @Doctrine\ORM\Mapping\Column(type="string", length="20", nullable=false, options={"comment": "Place where the verification occurred (server for server2server communications, customer for customer requests)"})
+     * @Doctrine\ORM\Mapping\Column(type="string", length="20", nullable=false, options={"comment": "Place where the verification occurred (server for server2server communications, cancel for customer canceled requests, redirect for processed customer requests)"})
      */
     protected string $place;
 
@@ -51,12 +53,12 @@ class Check
     protected string $receivedJson;
 
     /**
-     * The HostedOrder associated to this request.
+     * The XPayOrder associated to this request.
      *
-     * @Doctrine\ORM\Mapping\ManyToOne(targetEntity="Concrete\Package\CommunityStoreNexi\Entity\HostedOrder", inversedBy="checks")
-     * @Doctrine\ORM\Mapping\JoinColumn(name="hostedOrder", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @Doctrine\ORM\Mapping\ManyToOne(targetEntity="Concrete\Package\CommunityStoreNexi\Entity\XPayOrder", inversedBy="checks")
+     * @Doctrine\ORM\Mapping\JoinColumn(name="xPayOrder", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
-    protected ?HostedOrder $hostedOrder;
+    protected ?XPayOrder $xPayOrder;
 
     /**
      * The processing error.
@@ -74,7 +76,7 @@ class Check
         $this->createdOn = new DateTime();
         $this->place = $place;
         $this->receivedJson = '';
-        $this->hostedOrder = null;
+        $this->xPayOrder = null;
         $this->error = '';
     }
 
@@ -123,19 +125,19 @@ class Check
     }
 
     /**
-     * Get the HostedOrder associated to this request.
+     * Get the XPayOrder associated to this request.
      */
-    public function getHostedOrder(): ?HostedOrder
+    public function getXPayOrder(): ?XPayOrder
     {
-        return $this->hostedOrder;
+        return $this->xPayOrder;
     }
 
     /**
-     * Get the HostedOrder associated to this request.
+     * Get the XPayOrder associated to this request.
      */
-    public function setHostedOrder(?HostedOrder $value): self
+    public function setXPayOrder(?XPayOrder $value): self
     {
-        $this->hostedOrder = $value;
+        $this->xPayOrder = $value;
 
         return $this;
     }

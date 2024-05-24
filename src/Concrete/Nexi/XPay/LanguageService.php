@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Concrete\Package\CommunityStoreNexi\Nexi;
+namespace Concrete\Package\CommunityStoreNexi\Nexi\XPay;
 
 use Concrete\Core\Localization\Localization;
-use MLocati\Nexi\Dictionary\Language;
+use MLocati\Nexi\XPay\Dictionary\Language;
 
 class LanguageService
 {
@@ -15,7 +15,7 @@ class LanguageService
     private $localization;
 
     /**
-     * @var \MLocati\Nexi\Dictionary\Language
+     * @var \MLocati\Nexi\XPay\Dictionary\Language
      */
     private $language;
 

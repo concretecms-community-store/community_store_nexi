@@ -13,12 +13,16 @@
     "require": {
         "php": ">= 7.2",
         "concrete5/core": ">=8.5",
-        "mlocati/nexi": "^1"
+        "mlocati/nexi-xpay": "^1",
+        "mlocati/nexi-xpay-web": "^2"
     },
     "config": {
         "optimize-autoloader" : true,
         "preferred-install": "dist",
-        "sort-packages" : true
+        "sort-packages" : true,
+        "allow-plugins": {
+            "mlocati/composer-patcher": true
+        }
     },
     "$schema": "https://raw.githubusercontent.com/composer/composer/main/res/composer-schema.json"
 }

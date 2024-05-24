@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Concrete\Package\CommunityStoreNexi\Callback;
+namespace Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Callback;
 
 use Concrete\Core\Error\UserMessageException;
 use Concrete\Core\System\Mutex\MutexBusyException;
 use Concrete\Core\System\Mutex\MutexInterface;
-use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
-use MLocati\Nexi\Entity\Operation as NexiOperation;
+use Concrete\Package\CommunityStoreNexi\Entity\XPayWebOrder;
+use MLocati\Nexi\XPayWeb\Entity\Operation as NexiOperation;
 
 defined('C5_EXECUTE') or die('Access Denied');
 
 class Service
 {
-    const MUTEX_KEY = 'cstore_nexi_callback';
+    const MUTEX_KEY = 'cstore_nexi_xpayweb_callback';
 
     /**
      * @var \Concrete\Core\System\Mutex\MutexInterface
@@ -97,9 +97,9 @@ class Service
     /**
      * @return string empty string if ok, error description otherwise
      */
-    public function checkOperationData(HostedOrder $hostedOrder, NexiOperation $operation): string
+    public function checkOperationData(XPayWebOrder $xPayWebOrder, NexiOperation $operation): string
     {
-        $requestOrder = $hostedOrder->getRequest()->getOrder();
+        $requestOrder = $xPayWebOrder->getRequest()->getOrder();
         $expectedCurrency = $requestOrder->getCurrency();
         $actualCurrency = $operation->getOperationCurrency() ?? '';
         if ($expectedCurrency !== $actualCurrency) {

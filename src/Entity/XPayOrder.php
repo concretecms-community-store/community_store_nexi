@@ -7,19 +7,18 @@ namespace Concrete\Package\CommunityStoreNexi\Entity;
 use Concrete\Package\CommunityStore\Src\CommunityStore;
 use DateTime;
 use Doctrine\Common\Collections;
-use MLocati\Nexi\Entity\CreateOrderForHostedPayment\Request as NexiOrderRequest;
-use MLocati\Nexi\Entity\CreateOrderForHostedPayment\Response as NexiOrderResponse;
+use MLocati\Nexi\XPay\Entity\SimplePay\Request as NexiOrderRequest;
 
 defined('C5_EXECUTE') or die('Access Denied.');
 
 /**
  * @Doctrine\ORM\Mapping\Entity
  * @Doctrine\ORM\Mapping\Table(
- *     name="CommunityStoreNexiHostedOrder",
- *     options={"comment": "Hosted orders for Nexi payment method"}
+ *     name="CommunityStoreNexiXPayOrders",
+ *     options={"comment": "SimplePay orders for Nexi XPay payment method"}
  * )
  */
-class HostedOrder
+class XPayOrder
 {
     /**
      * The record ID (null if not yet persisted).
@@ -70,36 +69,18 @@ class HostedOrder
     protected $requestJson;
 
     /**
-     * The order ID as sent to Nexi.
+     * The codTrans as sent to Nexi.
      *
-     * @Doctrine\ORM\Mapping\Column(type="string", length=18, nullable=false, unique=true, options={"comment": "Order ID as sent to Nexi"})
-     *
-     * @var string
-     */
-    protected $nexiOrderID;
-
-    /**
-     * The response, if available (in JSON format).
-     *
-     * @Doctrine\ORM\Mapping\Column(type="text", nullable=false, options={"comment": "Response (in JSON format)"})
+     * @Doctrine\ORM\Mapping\Column(type="string", length=30, nullable=false, unique=true, options={"comment": "codTrans as sent to Nexi"})
      *
      * @var string
      */
-    protected $responseJson;
+    protected $nexiCodTrans;
 
     /**
-     * The error occurred while performing the hosted payment request.
+     * The XPayOrder\Check instances associated to this XPayOrder.
      *
-     * @Doctrine\ORM\Mapping\Column(type="text", nullable=false, options={"comment": "Error occurred while performing the hosted payment request"})
-     *
-     * @var string
-     */
-    protected $requestError;
-
-    /**
-     * The HostedOrder\Check instances associated to this HostedOrder.
-     *
-     * @Doctrine\ORM\Mapping\OneToMany(targetEntity="Concrete\Package\CommunityStoreNexi\Entity\HostedOrder\Check", mappedBy="hostedOrder")
+     * @Doctrine\ORM\Mapping\OneToMany(targetEntity="Concrete\Package\CommunityStoreNexi\Entity\XPayOrder\Check", mappedBy="xPayOrder")
      * @Doctrine\ORM\Mapping\OrderBy({"createdOn"="ASC", "id"="ASC"})
      *
      * @var \Doctrine\Common\Collections\Collection
@@ -116,9 +97,7 @@ class HostedOrder
         $this->environment = $environment;
         $this->associatedOrder = $associatedOrder;
         $this->requestJson = json_encode($request, JSON_UNESCAPED_SLASHES);
-        $this->nexiOrderID = $request->getOrder()->getOrderId();
-        $this->responseJson = '';
-        $this->requestError = '';
+        $this->nexiCodTrans = $request->getCodTrans();
         $this->checks = new Collections\ArrayCollection();
     }
 
@@ -165,46 +144,7 @@ class HostedOrder
     }
 
     /**
-     * Get the response, if available.
-     */
-    public function getResponse(): ?NexiOrderResponse
-    {
-        $json = $this->getResponseJson();
-        if ($json === '') {
-            return null;
-        }
-        $data = json_decode($json);
-
-        return new NexiOrderResponse($data);
-    }
-
-    /**
-     * Set the response, if available.
-     *
-     * @return $this
-     */
-    public function setResponse(?NexiOrderResponse $value): self
-    {
-        return $this->setResponseJson($value === null ? '' : json_encode($value, JSON_UNESCAPED_SLASHES));
-    }
-
-    public function getRequestError(): string
-    {
-        return $this->requestError;
-    }
-
-    /**
-     * @param string $value
-     */
-    public function setRequestError(string $value): self
-    {
-        $this->requestError = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get the HostedOrder\Check instances associated to this HostedOrder.
+     * Get the XPayOrder\Check instances associated to this XPayOrder.
      */
     public function getChecks(): Collections\Collection
     {
@@ -217,25 +157,5 @@ class HostedOrder
     protected function getRequestJson(): string
     {
         return $this->requestJson;
-    }
-
-    /**
-     * Get the response, if available (in JSON format).
-     */
-    protected function getResponseJson(): string
-    {
-        return $this->responseJson;
-    }
-
-    /**
-     * Set the response, if available (in JSON format).
-     *
-     * @return $this
-     */
-    protected function setResponseJson(string $value): self
-    {
-        $this->responseJson = $value;
-
-        return $this;
     }
 }

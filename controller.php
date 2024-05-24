@@ -16,9 +16,15 @@ class Controller extends Package implements ProviderAggregateInterface
 {
     const PAYMENTMETHOD_HANDLE = 'nexi';
 
-    const PATH_CALLBACK_CUSTOMER = '/ccm/community_store/nexi/callback/customer';
+    const PATH_XPAYCALLBACK_CUSTOMER_CANCEL = '/ccm/community_store/nexi/xpay/callback/customer/cancel';
+    
+    const PATH_XPAYCALLBACK_CUSTOMER_REDIRECT = '/ccm/community_store/nexi/xpay/callback/customer/redirect';
 
-    const PATH_CALLBACK_SERVER2SERVER = '/ccm/community_store/nexi/callback/server2server';
+    const PATH_XPAYCALLBACK_SERVER2SERVER = '/ccm/community_store/nexi/xpay/callback/server2server';
+    
+    const PATH_XPAYWEBCALLBACK_CUSTOMER = '/ccm/community_store/nexi/xpayweb/callback/customer';
+
+    const PATH_XPAYWEBCALLBACK_SERVER2SERVER = '/ccm/community_store/nexi/xpayweb/callback/server2server';
 
     protected $pkgHandle = 'community_store_nexi';
 
@@ -129,7 +135,10 @@ class Controller extends Package implements ProviderAggregateInterface
     private function registerRoutes(): void
     {
         $router = $this->app->make(Router::class);
-        $router->get(static::PATH_CALLBACK_CUSTOMER, [Callback\Customer::class, '__invoke']);
-        $router->post(static::PATH_CALLBACK_SERVER2SERVER, [Callback\Server::class, '__invoke']);
+        $router->get(static::PATH_XPAYCALLBACK_CUSTOMER_CANCEL, [Nexi\XPay\Callback::class, 'customerCancel']);
+        $router->get(static::PATH_XPAYCALLBACK_CUSTOMER_REDIRECT, [Nexi\XPay\Callback::class, 'customerRedirect']);
+        $router->post(static::PATH_XPAYCALLBACK_SERVER2SERVER, [Nexi\XPay\Callback::class, 'server2Server']);
+        $router->get(static::PATH_XPAYWEBCALLBACK_CUSTOMER, [Nexi\XPayWeb\Callback\Customer::class, '__invoke']);
+        $router->post(static::PATH_XPAYWEBCALLBACK_SERVER2SERVER, [Nexi\XPayWeb\Callback\Server::class, '__invoke']);
     }
 }

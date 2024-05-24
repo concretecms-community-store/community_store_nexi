@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Concrete\Package\CommunityStoreNexi\Callback;
+namespace Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Callback;
 
 use Concrete\Core\Application\Service\UserInterface;
 use Concrete\Core\Error\UserMessageException;
@@ -10,13 +10,13 @@ use Concrete\Core\Http\ResponseFactoryInterface;
 use Concrete\Core\Session\SessionValidator;
 use Concrete\Core\Url\Resolver\Manager\ResolverManagerInterface;
 use Concrete\Package\CommunityStore\Src\CommunityStore\Order;
-use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
-use Concrete\Package\CommunityStoreNexi\Nexi\Configuration\Factory as ConfigurationFactory;
-use Concrete\Package\CommunityStoreNexi\Nexi\HttpClient;
+use Concrete\Package\CommunityStoreNexi\Entity\XPayWebOrder;
+use Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Configuration\Factory as ConfigurationFactory;
+use Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\HttpClient;
 use Doctrine\ORM\EntityManagerInterface;
-use MLocati\Nexi\Client;
-use MLocati\Nexi\Entity\FindOrderById\Response as NexiFoundOrder;
-use MLocati\Nexi\Entity\Operation as NexiOperation;
+use MLocati\Nexi\XPayWeb\Client;
+use MLocati\Nexi\XPayWeb\Entity\FindOrderById\Response as NexiFoundOrder;
+use MLocati\Nexi\XPayWeb\Entity\Operation as NexiOperation;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -46,7 +46,7 @@ class Customer
     private $urlResolver;
 
     /**
-     * @var \Concrete\Package\CommunityStoreNexi\Nexi\Configuration\Factory
+     * @var \Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Configuration\Factory
      */
     private $configurationFactory;
 
@@ -61,7 +61,7 @@ class Customer
     private $userInterface;
 
     /**
-     * @var \Concrete\Package\CommunityStoreNexi\Callback\Service
+     * @var \Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Callback\Service
      */
     private $service;
 
@@ -87,21 +87,18 @@ class Customer
 
     public function __invoke(): Response
     {
-        $hostedOrder = $this->getHostedOrder();
-        if ($hostedOrder === null) {
+        $xPayWebOrder = $this->getXPayWebOrder();
+        if ($xPayWebOrder === null) {
             return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['/checkout']));
         }
         $this->service->acquireMutex();
         try {
-            $order = $hostedOrder->getAssociatedOrder();
-            if ($order->getPaid()) {
-                return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['checkout/complete']));
-            }
-            $check = new HostedOrder\Check(HostedOrder\Check::PLACE_CUSTOMER);
-            $check->setHostedOrder($hostedOrder);
+            $order = $xPayWebOrder->getAssociatedOrder();
+            $check = new XPayWebOrder\Check(XPayWebOrder\Check::PLACE_CUSTOMER);
+            $check->setXPayWebOrder($xPayWebOrder);
             $this->em->persist($check);
             try {
-                $nexiOrderID = $hostedOrder->getRequest()->getOrder()->getOrderId();
+                $nexiOrderID = $xPayWebOrder->getRequest()->getOrder()->getOrderId();
                 $nexiOrder = $this->createNexiClient()->findOrderById($nexiOrderID);
                 if ($nexiOrder === null) {
                     throw new RuntimeException(t('Unable to find the Nexi order with ID %s', $nexiOrderID));
@@ -110,15 +107,23 @@ class Customer
                 $operation = $this->getOperation($nexiOrder);
                 if ($operation === null) {
                     $check->setError(t('Missing operation'));
-
+                    if ($order->getPaid()) {
+                        return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['checkout/complete']));
+                    }
                     return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['/checkout']));
                 }
                 try {
                     if ($this->service->checkOperationResult($operation) !== true) {
+                        if ($order->getPaid()) {
+                            return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['checkout/complete']));
+                        }
                         return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['/checkout']));
                     }
                 } catch (UserMessageException $x) {
                     $check->setError($x->getMessage());
+                    if ($order->getPaid()) {
+                        return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['checkout/complete']));
+                    }
 
                     return $this->userInterface->buildErrorResponse(
                         t('Payment failed'),
@@ -129,13 +134,15 @@ class Customer
                         ])
                     );
                 }
-                $error = $this->service->checkOperationData($hostedOrder, $operation);
-                if ($error !== '') {
-                    $check->setError($error);
-                    throw new RuntimeException($error);
+                $error = $this->service->checkOperationData($xPayWebOrder, $operation);
+                $check->setError($error);
+                if (!$order->getPaid()) {
+                    if ($error !== '') {
+                        throw new RuntimeException($error);
+                    }
+                    $order->completeOrder($operation->getOperationId());
+                    $order->updateStatus(Order\OrderStatus\OrderStatus::getStartingStatus()->getHandle());
                 }
-                $order->completeOrder($operation->getOperationId());
-                $order->updateStatus(Order\OrderStatus\OrderStatus::getStartingStatus()->getHandle());
             } catch (Throwable $x) {
                 if ($check->getError() === '') {
                     $check->setError((string) $x);
@@ -151,18 +158,18 @@ class Customer
         return $this->responseFactory->redirect((string) $this->urlResolver->resolve(['checkout/complete']));
     }
 
-    private function getHostedOrder(): ?HostedOrder
+    private function getXPayWebOrder(): ?XPayWebOrder
     {
         $session = $this->sessionValidator->getActiveSession();
         if ($session === null) {
             return null;
         }
-        $hostedOrderID = $session->get('storeNexiHostedOrderID');
-        if (!is_numeric($hostedOrderID)) {
+        $xPayWebOrderID = $session->get('storeNexiXPayWebOrderID');
+        if (!is_numeric($xPayWebOrderID)) {
             return null;
         }
 
-        return $this->em->find(HostedOrder::class, (int) $hostedOrderID);
+        return $this->em->find(XPayWebOrder::class, (int) $xPayWebOrderID);
     }
 
     private function getOperation(NexiFoundOrder $order): ?NexiOperation

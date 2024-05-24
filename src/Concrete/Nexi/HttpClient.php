@@ -6,12 +6,10 @@ namespace Concrete\Package\CommunityStoreNexi\Nexi;
 
 use Concrete\Core\Http\Client\Client;
 use GuzzleHttp\Client as GuzzleHttpClient;
-use MLocati\Nexi\Exception\HttpRequestFailed;
-use MLocati\Nexi\HttpClient as NexiHttpClient;
 use Throwable;
 use Zend\Http\Request as ZendRequest;
 
-class HttpClient implements NexiHttpClient
+abstract class HttpClient
 {
     /**
      * @var \Concrete\Core\Http\Client\Client
@@ -24,11 +22,9 @@ class HttpClient implements NexiHttpClient
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @see \MLocati\Nexi\HttpClient::invoke()
+     * @throws \Throwable
      */
-    public function invoke(string $method, string $url, array $headers, string $rawBody): NexiHttpClient\Response
+    protected function _invoke(string $method, string $url, array $headers, string $rawBody): array
     {
         if ($this->coreClient instanceof GuzzleHttpClient) {
             return $this->invokeWithGuzzle($method, $url, $headers, $rawBody);
@@ -37,7 +33,10 @@ class HttpClient implements NexiHttpClient
         return $this->invokeWithZend($method, $url, $headers, $rawBody);
     }
 
-    private function invokeWithGuzzle(string $method, string $url, array $headers, string $rawBody): NexiHttpClient\Response
+    /**
+     * @throws \Throwable
+     */
+    private function invokeWithGuzzle(string $method, string $url, array $headers, string $rawBody): array
     {
         $options = [
             'http_errors' => false,
@@ -46,35 +45,30 @@ class HttpClient implements NexiHttpClient
         if ($rawBody !== '') {
             $options['body'] = $rawBody;
         }
-        try {
-            $response = $this->coreClient->request($method, $url, $options);
-        } catch (Throwable $x) {
-            throw new HttpRequestFailed($x->getMessage());
-        }
+        $response = $this->coreClient->request($method, $url, $options);
 
-        return new NexiHttpClient\Response($response->getStatusCode(), $response->getBody()->getContents());
+        return [$response->getStatusCode(), $response->getBody()->getContents()];
     }
 
-    private function invokeWithZend(string $method, string $url, array $headers, string $rawBody): NexiHttpClient\Response
+    /**
+     * @throws \Throwable
+     */
+    private function invokeWithZend(string $method, string $url, array $headers, string $rawBody): array
     {
-        try {
-            $request = new ZendRequest();
-            $request
-                ->setMethod($method)
-                ->setUri($url)
-            ;
-            if ($rawBody !== '') {
-                $request->setContent($rawBody);
-            }
-            $headers = $request->getHeaders();
-            foreach ($headers as $name => $value) {
-                $headers->addHeaderLine($name, $value);
-            }
-            $response = $this->coreClient->send($request);
-        } catch (Throwable $x) {
-            throw new HttpRequestFailed($x->getMessage());
+        $request = new ZendRequest();
+        $request
+            ->setMethod($method)
+            ->setUri($url)
+        ;
+        if ($rawBody !== '') {
+            $request->setContent($rawBody);
         }
+        $headers = $request->getHeaders();
+        foreach ($headers as $name => $value) {
+            $headers->addHeaderLine($name, $value);
+        }
+        $response = $this->coreClient->send($request);
 
-        return new NexiHttpClient\Response($response->getStatusCode(), $response->getBody());
+        return [$response->getStatusCode(), $response->getBody()];
     }
 }

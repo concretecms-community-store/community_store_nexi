@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Concrete\Package\CommunityStoreNexi\Nexi\Configuration;
+namespace Concrete\Package\CommunityStoreNexi\Nexi\XPay\Configuration;
 
 use Concrete\Core\Config\Repository\Repository;
-use Concrete\Package\CommunityStoreNexi\Nexi\Configuration;
+use Concrete\Package\CommunityStoreNexi\Nexi\XPay\Configuration;
 
 class Factory
 {
@@ -27,8 +27,9 @@ class Factory
 
         return new Configuration(
             $environment,
-            (string) $this->config->get("community_store_nexi::options.environments.{$environment}.basURL"),
-            (string) $this->config->get("community_store_nexi::options.environments.{$environment}.apiKey")
+            (string) $this->config->get("community_store_nexi::xpay.environments.{$environment}.basURL"),
+            (string) $this->config->get("community_store_nexi::xpay.environments.{$environment}.alias"),
+            (string) $this->config->get("community_store_nexi::xpay.environments.{$environment}.macKey")
         );
     }
 }

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Concrete\Package\CommunityStoreNexi\Callback;
+namespace Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Callback;
 
 use Concrete\Core\Error\UserMessageException;
 use Concrete\Core\Http\Request;
 use Concrete\Core\Http\Response;
 use Concrete\Core\Http\ResponseFactoryInterface;
 use Concrete\Package\CommunityStore\Src\CommunityStore\Order;
-use Concrete\Package\CommunityStoreNexi\Entity\HostedOrder;
+use Concrete\Package\CommunityStoreNexi\Entity\XPayWebOrder;
 use Doctrine\ORM\EntityManagerInterface;
-use MLocati\Nexi\Entity\Webhook\Request as WebhookRequest;
+use MLocati\Nexi\XPayWeb\Entity\Webhook\Request as WebhookRequest;
 use stdClass;
 
 defined('C5_EXECUTE') or die('Access Denied');
@@ -34,7 +34,7 @@ class Server
     private $em;
 
     /**
-     * @var \Concrete\Package\CommunityStoreNexi\Callback\Service
+     * @var \Concrete\Package\CommunityStoreNexi\Nexi\XPayWeb\Callback\Service
      */
     private $service;
 
@@ -53,17 +53,17 @@ class Server
     public function __invoke(): Response
     {
         $json = $this->request->getContent();
-        $check = new HostedOrder\Check(HostedOrder\Check::PLACE_SERVER);
-        $check->setReceivedJson($json);
+        $check = new XPayWebOrder\Check(XPayWebOrder\Check::PLACE_SERVER);
         $this->em->persist($check);
         try {
+            $check->setReceivedJson($json);
             $webhookRequest = $this->getNotificationBody($json);
-            $hostedOrder = $this->getHostedOrder($webhookRequest);
-            $check->setHostedOrder($hostedOrder);
+            $xPayWebOrder = $this->getXPayWebOrder($webhookRequest);
+            $check->setXPayWebOrder($xPayWebOrder);
             $this->service->acquireMutex();
             try {
-                if ($this->verifyWebhookRequest($webhookRequest, $hostedOrder)) {
-                    $order = $hostedOrder->getAssociatedOrder();
+                if ($this->verifyWebhookRequest($webhookRequest, $xPayWebOrder)) {
+                    $order = $xPayWebOrder->getAssociatedOrder();
                     if (!$order->getPaid()) {
                         $order->completeOrder($webhookRequest->getOperation()->getOperationId());
                         $order->updateStatus(Order\OrderStatus\OrderStatus::getStartingStatus()->getHandle());
@@ -99,19 +99,19 @@ class Server
         return $webhookRequest;
     }
 
-    private function getHostedOrder(WebhookRequest $webhookRequest): HostedOrder
+    private function getXPayWebOrder(WebhookRequest $webhookRequest): XPayWebOrder
     {
         $nexiOrderID = $webhookRequest->getOperation() === null ? '' : (string) $webhookRequest->getOperation()->getOrderId();
         if ($nexiOrderID === '') {
             throw new UserMessageException(t('Missing field in request: %s', 'operation.orderId'));
         }
-        $repo = $this->em->getRepository(HostedOrder::class);
-        $hostedOrder = $repo->findOneBy(['nexiOrderID' => $nexiOrderID]);
-        if ($hostedOrder === null) {
+        $repo = $this->em->getRepository(XPayWebOrder::class);
+        $xPayWebOrder = $repo->findOneBy(['nexiOrderID' => $nexiOrderID]);
+        if ($xPayWebOrder === null) {
             throw new UserMessageException(t('Unable to find the hosted order with Nexi ID %s', $nexiOrderID));
         }
 
-        return $hostedOrder;
+        return $xPayWebOrder;
     }
 
     /**
@@ -121,10 +121,10 @@ class Server
      *
      * @see https://developer.nexi.it/en/api/get-orders-orderId
      */
-    private function verifyWebhookRequest(WebhookRequest $webhookRequest, HostedOrder $hostedOrder): bool
+    private function verifyWebhookRequest(WebhookRequest $webhookRequest, XPayWebOrder $xPayWebOrder): bool
     {
-        $hostedOrderResponse = $hostedOrder->getResponse();
-        if ($hostedOrderResponse === null || $hostedOrderResponse->getSecurityToken() !== $webhookRequest->getSecurityToken()) {
+        $xPayWebOrderResponse = $xPayWebOrder->getResponse();
+        if ($xPayWebOrderResponse === null || $xPayWebOrderResponse->getSecurityToken() !== $webhookRequest->getSecurityToken()) {
             throw new UserMessageException(t('Wrong security token'));
         }
         $operation = $webhookRequest->getOperation();
@@ -134,7 +134,7 @@ class Server
         if ($this->service->checkOperationResult($operation) === false) {
             return false;
         }
-        $error = $this->service->checkOperationData($hostedOrder, $operation);
+        $error = $this->service->checkOperationData($xPayWebOrder, $operation);
         if ($error !== '') {
             throw new UserMessageException($error);
         }

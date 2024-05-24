@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Concrete\Package\CommunityStoreNexi\Nexi;
 
-use MLocati\Nexi\Configuration as ConfigurationInterface;
-use RuntimeException;
-
-class Configuration implements ConfigurationInterface
+abstract class Configuration
 {
     const ENVIRONMENT_SANDBOX = 'sandbox';
 
     const ENVIRONMENT_PRODUCTION = 'production';
+
+    const IMPLEMENTATION_XPAY = 'xpay';
+    
+    const IMPLEMENTATION_XPAYWEB = 'xpay_web';
 
     /**
      * @var string
@@ -28,46 +29,13 @@ class Configuration implements ConfigurationInterface
      */
     private $apiKey;
 
-    public function __construct(string $environment, string $baseURL, string $apiKey)
+    protected function __construct(string $environment)
     {
         $this->environment = $environment;
-        $this->baseURL = $baseURL;
-        $this->apiKey = $apiKey;
     }
 
     public function getEnvironment(): string
     {
         return $this->environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see \MLocati\Nexi\Configuration::getBaseUrl()
-     */
-    public function getBaseUrl(): string
-    {
-        if ($this->baseURL !== '') {
-            return $this->baseURL;
-        }
-
-        return $this->environment === self::ENVIRONMENT_SANDBOX ? static::DEFAULT_BASEURL_TEST : static::DEFAULT_BASEURL_PRODUCTION;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @see \MLocati\Nexi\Configuration::getApiKey()
-     */
-    public function getApiKey(): string
-    {
-        if ($this->apiKey !== '') {
-            return $this->apiKey;
-        }
-        if ($this->environment === self::ENVIRONMENT_SANDBOX) {
-            return static::DEFAULT_APIKEY_TEST;
-        }
-
-        throw new RuntimeException(t('The Nexi API key for production is not set'));
     }
 }
