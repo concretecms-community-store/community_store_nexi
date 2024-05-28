@@ -28,7 +28,7 @@ class Controller extends Package implements ProviderAggregateInterface
 
     protected $pkgHandle = 'community_store_nexi';
 
-    protected $pkgVersion = '2.0.0';
+    protected $pkgVersion = '2.0.1';
 
     /**
      * {@inheritdoc}
