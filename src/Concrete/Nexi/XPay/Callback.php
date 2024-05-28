@@ -326,9 +326,9 @@ class Callback
                     case 401:
                         throw new UserMessageException(t('Expired card: please check the data entered before trying again'));
                     case 402:
-                        throw new UserMessageException(t('Restricted or invalid cardi, or your account is closed'));
+                        throw new UserMessageException(t('Restricted or invalid card, or your account is closed'));
                     case 403:
-                        throw new UserMessageException(t('Invalid merchant: please contac our contact support'));
+                        throw new UserMessageException(t('Invalid merchant: please contact our contact support'));
                     case 404:
                         throw new UserMessageException(t('Transaction not permitted by the card issuer: please to use another payment instrument'));
                     case 405:
@@ -342,7 +342,7 @@ class Callback
                     case 409:
                         throw new UserMessageException(t('The card issuer suspects a fraudulent payment'));
                     case 410:
-                        throw new UserMessageException(t('You buyer entered an incorrect PIN/authentication more times than allowed by the issuing bank: please retry or use another payment method'));
+                        throw new UserMessageException(t('You specified an incorrect PIN/authentication more times than allowed by the issuing bank: please retry or use another payment method'));
                     case 411:
                         throw new UserMessageException(t('Transaction denied: please contact your bank for clarification, or use another payment method'));
                     case 412:
