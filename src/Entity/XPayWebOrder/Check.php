@@ -39,7 +39,7 @@ class Check
     /**
      * The place where the verification occurred (server for server2server communications, customer for customer requests).
      *
-     * @Doctrine\ORM\Mapping\Column(type="string", length="20", nullable=false, options={"comment": "Place where the verification occurred (server for server2server communications, customer for customer requests)"})
+     * @Doctrine\ORM\Mapping\Column(type="string", length=20, nullable=false, options={"comment": "Place where the verification occurred (server for server2server communications, customer for customer requests)"})
      */
     protected string $place;
 
