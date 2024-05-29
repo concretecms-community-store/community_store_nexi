@@ -6,6 +6,7 @@ namespace Concrete\Package\CommunityStoreNexi\Src\CommunityStore\Payment\Methods
 
 use Concrete\Core\Config\Repository\Repository;
 use Concrete\Core\Error\UserMessageException;
+use Concrete\Core\Http\Request;
 use Concrete\Core\Package\PackageService;
 use Concrete\Core\Support\Facade\Application;
 use Concrete\Core\Url\Resolver\Manager\ResolverManagerInterface;
@@ -500,7 +501,10 @@ class NexiPaymentMethod extends CommunityStore\Payment\Method
         $urlResolver = $app->make(ResolverManagerInterface::class);
         $package = $this->app->make(PackageService::class)->getByHandle('community_store_nexi');
         $config = $app->make(Repository::class);
-        $siteName = tc('SiteName', $app->make('site')->getSite()->getSiteName());
+        $siteName = (string) $app->make(Request::class)->getHost();
+        if ($siteName === '') {
+            $siteName = tc('SiteName', $app->make('site')->getSite()->getSiteName());
+        }
         $description = t('Order %1$s on %2$s', $order->getOrderID(), $siteName);
         $description = preg_replace('/\s+/', ' ', $description);
         if (class_exists('Transliterator')) {
@@ -548,7 +552,10 @@ class NexiPaymentMethod extends CommunityStore\Payment\Method
         $app = Application::getFacadeApplication();
         $config = $app->make(Repository::class);
         $urlResolver = $app->make(ResolverManagerInterface::class);
-        $siteName = tc('SiteName', $app->make('site')->getSite()->getSiteName());
+        $siteName = (string) $app->make(Request::class)->getHost();
+        if ($siteName === '') {
+            $siteName = tc('SiteName', $app->make('site')->getSite()->getSiteName());
+        }
         $customer = new CommunityStore\Customer\Customer();
         $orderIDWithYear = ((string) $order->getOrderID()) . '-' . date('y');
         $nexiLanguage = $app->make(XPayWebLanguageService::class)->getNexiCodeByCurrentLocale();
