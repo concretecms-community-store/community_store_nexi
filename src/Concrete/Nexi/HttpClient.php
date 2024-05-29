@@ -63,9 +63,9 @@ abstract class HttpClient
         if ($rawBody !== '') {
             $request->setContent($rawBody);
         }
-        $headers = $request->getHeaders();
+        $requestHeaders = $request->getHeaders();
         foreach ($headers as $name => $value) {
-            $headers->addHeaderLine($name, $value);
+            $requestHeaders->addHeaderLine($name, $value);
         }
         $response = $this->coreClient->send($request);
 
