@@ -522,7 +522,7 @@ class NexiPaymentMethod extends CommunityStore\Payment\Method
         }
         $orderIDWithYear = ((string) $order->getOrderID()) . '/' . date('Y');
         $request = new XPayEntity\SimplePay\Request();
-            $request
+        $request
             ->setImportoAsDecimal($order->getTotal())
             ->setDivisa($currency)
             ->setCodTrans($orderIDWithYear)
