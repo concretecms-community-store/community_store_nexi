@@ -9,6 +9,7 @@ use Concrete\Core\Database\EntityManager\Provider\StandardPackageProvider;
 use Concrete\Core\Package\Package;
 use Concrete\Core\Routing\Router;
 use Concrete\Package\CommunityStore\Src\CommunityStore;
+use Concrete\Package\CommunityStoreNexi\Src\CommunityStore\Payment\Methods\Nexi\LogProvider;
 
 defined('C5_EXECUTE') or die('Access Denied');
 
@@ -93,6 +94,12 @@ class Controller extends Package implements ProviderAggregateInterface
     public function on_start()
     {
         $this->registerAutoload();
+        $this->app->extend(CommunityStore\Payment\LogProviderFactory::class, function(CommunityStore\Payment\LogProviderFactory $factory) {
+            return $factory
+                ->registerProvider($this->app->make(LogProvider::class, ['implementation' => 'xpay']))
+                ->registerProvider($this->app->make(LogProvider::class, ['implementation' => 'xpay_web']))
+            ;
+        });
         if (!$this->app->isRunThroughCommandLineInterface()) {
             $this->registerRoutes();
         }
