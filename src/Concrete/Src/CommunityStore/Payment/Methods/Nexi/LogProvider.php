@@ -122,10 +122,10 @@ class LogProvider implements CSLogProvider
                     ->select('xo, xoc, o')
                     ->leftJoin('xo.checks', 'xoc')
                     ->leftJoin('xo.associatedOrder', 'o')
-                    ->orderBy('xo.createdOn', 'DESC')
-                    ->orderBy('xo.id', 'DESC')
-                    ->orderBy('xoc.createdOn', 'DESC')
-                    ->orderBy('xoc.id', 'DESC')
+                    ->addOrderBy('xo.createdOn')
+                    ->addOrderBy('xo.id')
+                    ->addOrderBy('xoc.createdOn')
+                    ->addOrderBy('xoc.id')
                 ;
                 break;
         }
